@@ -63,6 +63,7 @@ app.add_middleware(
     ],
     allow_origin_regex=(
         r"https?://(localhost|127\.0\.0\.1)(:\d{1,5})?"
+        r"|https://[a-z0-9-]+\.vercel\.app"
     ),
     allow_credentials=True,
     allow_methods=[

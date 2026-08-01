@@ -130,12 +130,13 @@ export default function PatientsPage() {
     }
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: string | Date | null | undefined) => {
+    if (!date) return '';
     return new Intl.DateTimeFormat('en-US', {
       year: 'numeric',
       month: 'short',
       day: 'numeric'
-    }).format(date);
+    }).format(new Date(date));
   };
 
   if (isLoading) {

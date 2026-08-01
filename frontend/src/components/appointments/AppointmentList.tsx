@@ -66,7 +66,7 @@ export default function AppointmentList({ appointments: initialAppointments, onA
     }
   };
 
-  const handleDeleteAppointment = async (appointmentId: string) => {
+  const handleDeleteAppointment = async (appointmentId: number | string) => {
     if (!confirm('Are you sure you want to delete this appointment?')) return;
     
     try {

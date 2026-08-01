@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import Table from "@/components/ui/table";
+import DataTable from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
@@ -62,7 +62,7 @@ export default function DoctorList({ doctors: initialDoctors, onDoctorsChange }:
     }
   };
 
-  const handleDeleteDoctor = async (doctorId: number) => {
+  const handleDeleteDoctor = async (doctorId: number | string) => {
     if (!confirm('Are you sure you want to delete this doctor?')) return;
     
     try {
@@ -106,51 +106,52 @@ export default function DoctorList({ doctors: initialDoctors, onDoctorsChange }:
             </div>
           </div>
         ) : (
-          <Table headers={["Name", "Specialization", "Phone", "Email", "Status", "Actions"]}>
-            {doctors.length === 0 ? (
-              <tr>
-                <td colSpan={6} className="text-center py-8 text-emerald-400">
-                  No doctors found.
-                </td>
-              </tr>
-            ) : (
-              doctors.map((doctor) => (
-                <tr key={doctor.id}>
-                  <td>{`${doctor.first_name} ${doctor.last_name}`}</td>
-                  <td>{doctor.specialization}</td>
-                  <td>{doctor.phone}</td>
-                  <td>{doctor.email}</td>
-                  <td>
-                    <span className={`px-2 py-1 rounded-full text-xs ${
-                      doctor.is_active 
-                        ? 'bg-green-100 text-green-800' 
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {doctor.is_active ? 'Active' : 'Inactive'}
-                    </span>
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => openEditForm(doctor)}
-                      >
-                        Edit
-                      </Button>
-                      <Button
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleDeleteDoctor(doctor.id)}
-                      >
-                        Delete
-                      </Button>
-                    </div>
-                  </td>
-                </tr>
-              ))
-            )}
-          </Table>
+          <DataTable
+            columns={[
+              { key: 'first_name', header: 'Name', render: (d) => `${d.first_name} ${d.last_name}` },
+              { key: 'specialization', header: 'Specialization' },
+              { key: 'phone', header: 'Phone' },
+              { key: 'email', header: 'Email' },
+              {
+                key: 'is_active',
+                header: 'Status',
+                render: (d) => (
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    d.is_active
+                      ? 'bg-green-100 text-green-800'
+                      : 'bg-red-100 text-red-800'
+                  }`}>
+                    {d.is_active ? 'Active' : 'Inactive'}
+                  </span>
+                ),
+              },
+              {
+                key: 'actions',
+                header: 'Actions',
+                render: (d) => (
+                  <div className="flex items-center gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => openEditForm(d)}
+                    >
+                      Edit
+                    </Button>
+                    <Button
+                      variant="destructive"
+                      size="sm"
+                      onClick={() => handleDeleteDoctor(d.id)}
+                    >
+                      Delete
+                    </Button>
+                  </div>
+                ),
+              },
+            ]}
+            rows={doctors}
+            rowKey={(d) => d.id}
+            emptyMessage="No doctors found."
+          />
         )}
       </CardContent>
 

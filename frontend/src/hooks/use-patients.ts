@@ -132,8 +132,6 @@ export function usePatients() {
 
   // Load patients on mount
   useEffect(() => {
-  // FIX: Only run when fetchPatients changes. fetchPatients is memoized with useCallback.
-  useEffect(() => {
     fetchPatients()
   }, [fetchPatients])
 

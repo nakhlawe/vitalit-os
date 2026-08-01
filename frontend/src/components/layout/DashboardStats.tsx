@@ -13,6 +13,7 @@ import {
   TrendingDown
 } from 'lucide-react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
+import { API_BASE_URL } from '@/lib/constants';
 
 interface DashboardStats {
   totalPatients: number;
@@ -50,7 +51,7 @@ const DashboardStats: React.FC = () => {
 
   const fetchDashboardStats = async () => {
     try {
-      const response = await fetch('http://localhost:8000/dashboard/stats', {
+      const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`,
         },

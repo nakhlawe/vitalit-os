@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { LineChartCard } from '@/components/charts/LineChartCard';
 import { Button } from '@/components/ui/button';
+import { API_BASE_URL } from '@/lib/constants';
 
 interface AnalyticsData {
   overview: {
@@ -35,7 +36,7 @@ export default function AnalyticsPage() {
   const fetchAnalyticsData = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000'}/dashboard/stats`, {
+      const response = await fetch(`${API_BASE_URL}/dashboard/stats`, {
         headers: { Authorization: `Bearer ${typeof window !== 'undefined' ? localStorage.getItem('access_token') : ''}` },
       });
       const data = await response.json();

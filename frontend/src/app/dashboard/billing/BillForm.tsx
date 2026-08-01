@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { billingAPI } from "@/lib/api";
 import { Card } from "@/components/ui/card";
-import { Patient, BillCreate } from '@/types/api';
+import { Patient, Bill } from '@/types/api';
 
 export default function BillForm({ onBillAdded, patients }: { onBillAdded?: () => void; patients: Patient[] }) {
   const [form, setForm] = useState({
@@ -32,7 +32,7 @@ export default function BillForm({ onBillAdded, patients }: { onBillAdded?: () =
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const billData: BillCreate = {
+    const billData: Partial<Bill> = {
       patientId: form.patientId,
       patientName: form.patientName,
       amount: form.amount,

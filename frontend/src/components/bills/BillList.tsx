@@ -63,12 +63,12 @@ export default function BillList({ bills: initialBills, onBillsChange }: BillLis
     }
   };
 
-  const handleDeleteBill = async (billId: number) => {
+  const handleDeleteBill = async (billId: number | string) => {
     if (!confirm('Are you sure you want to delete this bill?')) return;
     
     try {
-      await billingAPI.delete(billId.toString());
-      setBills(prev => prev.filter(b => b.id !== billId.toString()));
+      await billingAPI.delete(billId);
+      setBills(prev => prev.filter(b => b.id !== billId));
       toast.success('Bill deleted successfully');
       if (onBillsChange) onBillsChange();
     } catch (error: any) {
