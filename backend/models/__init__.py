@@ -3,6 +3,8 @@ from .patient import Patient, PatientDocument
 from .doctor import Doctor
 from .appointment import Appointment, AppointmentStatusEnum
 from .billing import Bill, BillItem, Payment, InsuranceClaim, PaymentStatusEnum
+from .inventory import InventoryItem
+from .medical_record import MedicalRecord
 from backend.core.database import Base
 
 __all__ = [
@@ -26,5 +28,9 @@ __all__ = [
     "BillItem",
     "Payment",
     "InsuranceClaim",
+
+    # Inventory & Records models
+    "InventoryItem",
+    "MedicalRecord",
     "Base",
 ] 

@@ -275,6 +275,33 @@ function mapInventoryItem(raw: any): InventoryItem {
   };
 }
 
+const MEDICAL_RECORD_FIELDS = [
+  'patient_id',
+  'doctor_id',
+  'visit_date',
+  'chief_complaint',
+  'diagnosis',
+  'treatment_plan',
+  'prescription_notes',
+  'notes',
+] as const;
+
+function mapMedicalRecord(raw: any): MedicalRecord {
+  return {
+    id: raw?.id,
+    patient_id: raw?.patient_id,
+    doctor_id: raw?.doctor_id ?? null,
+    visit_date: raw?.visit_date ?? '',
+    chief_complaint: raw?.chief_complaint ?? '',
+    diagnosis: raw?.diagnosis ?? '',
+    treatment_plan: raw?.treatment_plan ?? '',
+    prescription_notes: raw?.prescription_notes ?? '',
+    notes: raw?.notes ?? '',
+    created_by: raw?.created_by ?? null,
+    created_at: raw?.created_at ?? raw?.createdAt,
+  };
+}
+
 export const authAPI = {
   login: async (data: { username: string; password: string }): Promise<LoginResponse> => {
     const form = new URLSearchParams();
@@ -388,131 +415,47 @@ export const billingAPI = {
   },
 };
 
-const INVENTORY_STORAGE_KEY = 'vitalit_inventory';
-
-function loadLocalInventory(): InventoryItem[] {
-  try {
-    if (typeof window === 'undefined') return [];
-    const raw = window.localStorage.getItem(INVENTORY_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as any[]).map(mapInventoryItem) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveLocalInventory(items: InventoryItem[]): void {
-  try {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(INVENTORY_STORAGE_KEY, JSON.stringify(items));
-    }
-  } catch {
-    // ignore storage write failures
-  }
-}
-
 export const inventoryAPI = {
-  getAll: async (): Promise<InventoryItem[]> => {
-    return loadLocalInventory();
+  getAll: async (params?: Record<string, unknown>): Promise<InventoryItem[]> => {
+    const { data } = await apiClient.get('/inventory/', { params });
+    return (Array.isArray(data) ? data : []).map(mapInventoryItem);
+  },
+  getById: async (id: number | string): Promise<InventoryItem> => {
+    const { data } = await apiClient.get(`/inventory/${id}`);
+    return mapInventoryItem(data);
   },
   create: async (data: Record<string, unknown>): Promise<InventoryItem> => {
-    const items = loadLocalInventory();
-    const item: InventoryItem = {
-      id: Date.now(),
-      name: (data.name as string) || '',
-      description: (data.description as string) || '',
-      category: (data.category as string) || '',
-      quantity: Number(data.current_quantity ?? data.quantity ?? 0),
-      current_quantity: Number(data.current_quantity ?? data.quantity ?? 0),
-      minimum_quantity: Number(data.minimum_quantity ?? 0),
-      unit: (data.unit as string) || '',
-      price: Number(data.unit_price ?? data.price ?? 0),
-      unit_price: Number(data.unit_price ?? data.price ?? 0),
-      supplier: (data.supplier as string) || '',
-      location: (data.location as string) || '',
-      is_active: Boolean(data.is_active ?? true),
-      status: 'In Stock',
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    };
-    saveLocalInventory([...items, item]);
-    return mapInventoryItem(item);
+    const { data: response } = await apiClient.post('/inventory/', pick(data, INVENTORY_FIELDS));
+    return mapInventoryItem(response);
   },
   update: async (id: number | string, data: Record<string, unknown>): Promise<InventoryItem> => {
-    const items = loadLocalInventory();
-    const next = items.map((item) =>
-      item.id === id
-        ? {
-            ...item,
-            ...pick(data, INVENTORY_FIELDS),
-            quantity: Number(data.current_quantity ?? item.quantity),
-            current_quantity: Number(data.current_quantity ?? item.current_quantity),
-            updated_at: new Date().toISOString(),
-          }
-        : item,
-    );
-    saveLocalInventory(next);
-    return next.find((item) => item.id === id) as InventoryItem;
+    const { data: response } = await apiClient.put(`/inventory/${id}`, pick(data, INVENTORY_FIELDS));
+    return mapInventoryItem(response);
   },
   delete: async (id: number | string): Promise<void> => {
-    saveLocalInventory(loadLocalInventory().filter((item) => item.id !== id));
+    await apiClient.delete(`/inventory/${id}`);
   },
 };
 
-const RECORDS_STORAGE_KEY = 'vitalit_records';
-
-function loadLocalRecords(): MedicalRecord[] {
-  try {
-    if (typeof window === 'undefined') return [];
-    const raw = window.localStorage.getItem(RECORDS_STORAGE_KEY);
-    return raw ? (JSON.parse(raw) as MedicalRecord[]) : [];
-  } catch {
-    return [];
-  }
-}
-
-function saveLocalRecords(records: MedicalRecord[]): void {
-  try {
-    if (typeof window !== 'undefined') {
-      window.localStorage.setItem(RECORDS_STORAGE_KEY, JSON.stringify(records));
-    }
-  } catch {
-    // ignore storage write failures
-  }
-}
-
 export const recordsAPI = {
-  getAll: async (): Promise<MedicalRecord[]> => loadLocalRecords(),
+  getAll: async (params?: Record<string, unknown>): Promise<MedicalRecord[]> => {
+    const { data } = await apiClient.get('/records/', { params });
+    return (Array.isArray(data) ? data : []).map(mapMedicalRecord);
+  },
   getById: async (id: number | string): Promise<MedicalRecord> => {
-    const record = loadLocalRecords().find((r) => r.id === id);
-    if (!record) throw new Error('Medical record not found');
-    return record;
+    const { data } = await apiClient.get(`/records/${id}`);
+    return mapMedicalRecord(data);
   },
   create: async (data: Record<string, unknown>): Promise<MedicalRecord> => {
-    const records = loadLocalRecords();
-    const record: MedicalRecord = {
-      id: Date.now(),
-      patient_id: Number(data.patient_id ?? 0),
-      doctor_id: Number(data.doctor_id ?? 0),
-      visit_date: (data.visit_date as string) || new Date().toISOString().slice(0, 10),
-      chief_complaint: (data.chief_complaint as string) || '',
-      diagnosis: (data.diagnosis as string) || '',
-      treatment_plan: (data.treatment_plan as string) || '',
-      prescription_notes: (data.prescription_notes as string) || '',
-      notes: (data.notes as string) || '',
-      created_by: Number(data.created_by ?? 1),
-      created_at: new Date().toISOString(),
-    };
-    saveLocalRecords([record, ...records]);
-    return record;
+    const { data: response } = await apiClient.post('/records/', pick(data, MEDICAL_RECORD_FIELDS));
+    return mapMedicalRecord(response);
   },
   update: async (id: number | string, data: Record<string, unknown>): Promise<MedicalRecord> => {
-    const records = loadLocalRecords();
-    const next = records.map((r) => (r.id === id ? { ...r, ...(data as Partial<MedicalRecord>) } : r));
-    saveLocalRecords(next);
-    return next.find((r) => r.id === id) as MedicalRecord;
+    const { data: response } = await apiClient.put(`/records/${id}`, pick(data, MEDICAL_RECORD_FIELDS));
+    return mapMedicalRecord(response);
   },
   delete: async (id: number | string): Promise<void> => {
-    saveLocalRecords(loadLocalRecords().filter((r) => r.id !== id));
+    await apiClient.delete(`/records/${id}`);
   },
 };
 

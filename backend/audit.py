@@ -16,7 +16,37 @@ class DateTimeEncoder(json.JSONEncoder):
 
 class AuditLogger:
     """Audit logging system for tracking user actions."""
-    
+
+    @staticmethod
+    def log_action(
+        db: Session,
+        user_id: Optional[int],
+        action: str,
+        table_name: str,
+        record_id: int,
+        old_values: dict = None,
+        new_values: dict = None,
+        request: Request = None,
+    ) -> "AuditLog":
+        """Log a generic user action.
+
+        Normalizes a falsy user_id to NULL so that system-level actions do not
+        violate the users foreign key.
+        """
+        audit_log = AuditLog(
+            user_id=user_id if user_id else None,
+            action=action,
+            table_name=table_name,
+            record_id=record_id,
+            old_values=str(old_values) if old_values else None,
+            new_values=str(new_values) if new_values else None,
+            ip_address=request.client.host if request else None,
+            user_agent=request.headers.get("user-agent") if request else None,
+        )
+        db.add(audit_log)
+        db.commit()
+        return audit_log
+
     @staticmethod
     def log_create(db: Session, user_id: int, table_name: str, record_id: int, new_values: dict, request: Request = None):
         """Log a create operation."""

@@ -4,14 +4,13 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from backend.routers import (
     patients, doctors, appointments, billing, auth, dashboard,
+    inventory, records,
 )
 from backend.models import Base
 from backend.core.database import engine
 from backend.core.config import settings
-# If you have custom middleware, exceptions, logger, update their imports here
-# from backend.core.middleware import LoggingMiddleware, SecurityMiddleware,
-# RateLimitMiddleware
-# from backend.core.exceptions import VitalitException, create_http_exception
+from backend.middleware import LoggingMiddleware, SecurityMiddleware, RateLimitMiddleware
+from backend.exceptions import VitalitException, create_http_exception
 # from backend.core.logger import logger
 
 
@@ -41,9 +40,9 @@ app = FastAPI(
 )
 
 # Add middleware
-# app.add_middleware(LoggingMiddleware)
-# app.add_middleware(SecurityMiddleware)
-# app.add_middleware(RateLimitMiddleware, requests_per_minute=60)
+app.add_middleware(LoggingMiddleware)
+app.add_middleware(SecurityMiddleware)
+app.add_middleware(RateLimitMiddleware, requests_per_minute=settings.RATE_LIMIT_PER_MINUTE)
 
 # CORS configuration
 app.add_middleware(
@@ -79,12 +78,11 @@ app.add_middleware(
 )
 
 
-# Global exception handler
-# @app.exception_handler(VitalitException)
-# async def vitalit_exception_handler(request: Request, exc: VitalitException):
-#     """Handle custom Vitalit exceptions."""
-#     print(f"VitalitException: {exc.message} - {exc.error_code}")
-#     return create_http_exception(exc)
+@app.exception_handler(VitalitException)
+async def vitalit_exception_handler(request: Request, exc: VitalitException):
+    """Handle custom Vitalit exceptions."""
+    print(f"VitalitException: {exc.message} - {exc.error_code}")
+    return create_http_exception(exc)
 
 @app.exception_handler(Exception)
 async def global_exception_handler(request: Request, exc: Exception):
@@ -334,5 +332,7 @@ app.include_router(doctors.router)
 app.include_router(appointments.router)
 app.include_router(billing.router)
 app.include_router(dashboard.router)
+app.include_router(inventory.router)
+app.include_router(records.router)
 
 

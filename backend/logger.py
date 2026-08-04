@@ -2,7 +2,7 @@ import logging
 import logging.handlers
 import os
 from typing import Optional
-from config import settings
+from backend.core.config import settings
 
 
 def setup_logger(name: str = "vitalit",
@@ -10,13 +10,15 @@ def setup_logger(name: str = "vitalit",
     """Setup a logger with file and console handlers."""
     
     if log_file is None:
-        log_file = settings.log_file
+        log_file = settings.LOG_FILE
     
     # Create logs directory if it doesn't exist
-    os.makedirs("logs", exist_ok=True)
+    log_dir = os.path.dirname(log_file)
+    if log_dir:
+        os.makedirs(log_dir, exist_ok=True)
     
     logger = logging.getLogger(name)
-    logger.setLevel(getattr(logging, settings.log_level.upper()))
+    logger.setLevel(getattr(logging, settings.LOG_LEVEL.upper()))
     
     # Prevent duplicate handlers
     if logger.handlers:
@@ -39,7 +41,7 @@ def setup_logger(name: str = "vitalit",
     
     # File handler with rotation
     file_handler = logging.handlers.RotatingFileHandler(
-        f"logs/{log_file}",
+        log_file,
         maxBytes=10*1024*1024,  # 10MB
         backupCount=5
     )
@@ -49,7 +51,7 @@ def setup_logger(name: str = "vitalit",
     
     # Error file handler
     error_handler = logging.handlers.RotatingFileHandler(
-        f"logs/error_{log_file}",
+        os.path.join(log_dir or ".", f"error_{os.path.basename(log_file)}"),
         maxBytes=10*1024*1024,  # 10MB
         backupCount=5
     )

@@ -397,8 +397,7 @@ async def reset_user_password(
 
 @router.post("/change-password")
 async def change_own_password(
-    current_password: str,
-    new_password: str,
+    payload: schemas.ChangePasswordRequest,
     current_user: models.User = Depends(security.get_current_active_user),
     db: Session = Depends(database.get_db),
     request: Request = None
@@ -406,14 +405,14 @@ async def change_own_password(
     """Change own password."""
     
     # Verify current password
-    if not security.verify_password(current_password, current_user.hashed_password):
+    if not security.verify_password(payload.current_password, current_user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Current password is incorrect"
         )
     
     # Update password
-    current_user.hashed_password = get_password_hash(new_password)
+    current_user.hashed_password = get_password_hash(payload.new_password)
     db.commit()
     db.refresh(current_user)
     

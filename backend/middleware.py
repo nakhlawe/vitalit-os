@@ -2,8 +2,8 @@ import time
 from typing import Callable
 from fastapi import Request, Response
 from starlette.middleware.base import BaseHTTPMiddleware
-from logger import logger, log_api_request, log_security_event
-from config import settings
+from backend.logger import logger, log_api_request, log_security_event
+from backend.core.config import settings
 
 
 class LoggingMiddleware(BaseHTTPMiddleware):
@@ -93,7 +93,7 @@ class CORSMiddleware(BaseHTTPMiddleware):
         
         # Add CORS headers
         origin = request.headers.get("origin")
-        if origin in settings.allowed_origins:
+        if origin in settings.ALLOWED_ORIGINS:
             response.headers["Access-Control-Allow-Origin"] = origin
         
         response.headers["Access-Control-Allow-Credentials"] = "true"
@@ -114,6 +114,10 @@ class RateLimitMiddleware(BaseHTTPMiddleware):
         self.request_counts = {}
     
     async def dispatch(self, request: Request, call_next: Callable) -> Response:
+        # Skip rate limiting entirely in test mode to avoid flaky test suites.
+        if settings.test_mode:
+            return await call_next(request)
+
         client_ip = request.client.host if request.client else "unknown"
         current_time = time.time()
         

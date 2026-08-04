@@ -4,4 +4,6 @@ from .doctor import *
 from .appointment import *
 from .billing import *
 from .auth import *
-from .common import * 
+from .common import *
+from .inventory import *
+from .record import * 
