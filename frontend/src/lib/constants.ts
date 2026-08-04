@@ -10,6 +10,10 @@ export const ROUTES = {
   INVENTORY: '/dashboard/inventory',
   ANALYTICS: '/dashboard/analytics',
   SYSTEM: '/dashboard/system',
+  BRANCHES: '/dashboard/branches',
+  OPERATIONS: '/dashboard/operations',
+  TEMPLATES: '/dashboard/templates',
+  TRIAGE: '/dashboard/triage',
 } as const;
 
 export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:8000';

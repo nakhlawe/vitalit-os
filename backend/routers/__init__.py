@@ -5,3 +5,7 @@ from . import billing
 from . import inventory
 from . import records
 from . import auth
+from . import branches
+from . import operations
+from . import templates
+from . import triage

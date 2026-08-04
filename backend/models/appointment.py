@@ -5,6 +5,7 @@ from backend.core.database import Base
 import enum
 
 
+
 class AppointmentStatusEnum(enum.Enum):
     SCHEDULED = "scheduled"
     CONFIRMED = "confirmed"
@@ -20,6 +21,7 @@ class Appointment(Base):
     appointment_id = Column(String(20), unique=True, index=True, nullable=False)
     patient_id = Column(Integer, ForeignKey("patients.id"), nullable=False)
     doctor_id = Column(Integer, ForeignKey("doctors.id"), nullable=False)
+    branch_id = Column(Integer, ForeignKey("branches.id"), nullable=True)
     scheduled_datetime = Column(DateTime, nullable=False)
     duration_minutes = Column(Integer, default=30)
     reason = Column(Text, nullable=False)
@@ -32,6 +34,7 @@ class Appointment(Base):
     # Relationships
     patient = relationship("Patient", back_populates="appointments")
     doctor = relationship("Doctor", back_populates="appointments")
+    branch = relationship("Branch", back_populates="appointments")
     created_by_user = relationship("User", back_populates="appointments_created")
     
     # Indexes
@@ -40,4 +43,5 @@ class Appointment(Base):
         Index('idx_appointment_status', 'status'),
         Index('idx_appointment_patient', 'patient_id'),
         Index('idx_appointment_doctor', 'doctor_id'),
+        Index('idx_appointment_branch', 'branch_id'),
     ) 

@@ -23,6 +23,7 @@ class Doctor(Base):
     
     # Relationships
     appointments = relationship("Appointment", back_populates="doctor")
+    doctor_branches = relationship("DoctorBranch", back_populates="doctor")
     
     # Indexes
     __table_args__ = (

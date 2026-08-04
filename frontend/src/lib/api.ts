@@ -459,6 +459,124 @@ export const recordsAPI = {
   },
 };
 
+export const branchesAPI = {
+  getAll: async (params?: Record<string, unknown>) => {
+    const { data } = await apiClient.get('/branches/', { params });
+    return Array.isArray(data) ? data : [];
+  },
+  getById: async (id: number | string) => {
+    const { data } = await apiClient.get(`/branches/${id}`);
+    return data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.post('/branches/', data);
+    return response;
+  },
+  update: async (id: number | string, data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.put(`/branches/${id}`, data);
+    return response;
+  },
+  delete: async (id: number | string) => {
+    await apiClient.delete(`/branches/${id}`);
+  },
+  getDoctors: async (branchId: number | string) => {
+    const { data } = await apiClient.get(`/branches/${branchId}/doctors`);
+    return Array.isArray(data) ? data : [];
+  },
+  assignDoctor: async (branchId: number | string, data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.post(`/branches/${branchId}/doctors`, data);
+    return response;
+  },
+};
+
+export const hospitalsAPI = {
+  getAll: async (params?: Record<string, unknown>) => {
+    const { data } = await apiClient.get('/hospitals/', { params });
+    return Array.isArray(data) ? data : [];
+  },
+  getById: async (id: number | string) => {
+    const { data } = await apiClient.get(`/hospitals/${id}`);
+    return data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.post('/hospitals/', data);
+    return response;
+  },
+  update: async (id: number | string, data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.put(`/hospitals/${id}`, data);
+    return response;
+  },
+  delete: async (id: number | string) => {
+    await apiClient.delete(`/hospitals/${id}`);
+  },
+};
+
+export const operationsAPI = {
+  getAll: async (params?: Record<string, unknown>) => {
+    const { data } = await apiClient.get('/operations/', { params });
+    return Array.isArray(data) ? data : [];
+  },
+  getById: async (id: number | string) => {
+    const { data } = await apiClient.get(`/operations/${id}`);
+    return data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.post('/operations/', data);
+    return response;
+  },
+  update: async (id: number | string, data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.put(`/operations/${id}`, data);
+    return response;
+  },
+  delete: async (id: number | string) => {
+    await apiClient.delete(`/operations/${id}`);
+  },
+};
+
+export const templatesAPI = {
+  getAll: async (params?: Record<string, unknown>) => {
+    const { data } = await apiClient.get('/templates/', { params });
+    return Array.isArray(data) ? data : [];
+  },
+  getById: async (id: number | string) => {
+    const { data } = await apiClient.get(`/templates/${id}`);
+    return data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.post('/templates/', data);
+    return response;
+  },
+  update: async (id: number | string, data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.put(`/templates/${id}`, data);
+    return response;
+  },
+  delete: async (id: number | string) => {
+    await apiClient.delete(`/templates/${id}`);
+  },
+};
+
+export const triageAPI = {
+  getAll: async (params?: Record<string, unknown>) => {
+    const { data } = await apiClient.get('/triage/', { params });
+    return Array.isArray(data) ? data : [];
+  },
+  getById: async (id: number | string) => {
+    const { data } = await apiClient.get(`/triage/${id}`);
+    return data;
+  },
+  create: async (data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.post('/triage/', data);
+    return response;
+  },
+  update: async (id: number | string, data: Record<string, unknown>) => {
+    const { data: response } = await apiClient.put(`/triage/${id}`, data);
+    return response;
+  },
+  delete: async (id: number | string) => {
+    await apiClient.delete(`/triage/${id}`);
+  },
+};
+
 export const dashboardAPI = {
   getStats: async (): Promise<DashboardStats> => {
     const { data } = await apiClient.get('/dashboard/stats');
